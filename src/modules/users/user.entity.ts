@@ -22,8 +22,9 @@ export class User extends Model<User> {
     password: string;
 
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.STRING,
         allowNull: true,
     })
     phone: number;
 }
+
