@@ -9,8 +9,11 @@ async function bootstrap() {
     // handle all user input validation globally
     app.useGlobalPipes(new ValidateInputPipe());
     await app.listen(3000);
+    console.info(`Application is running on: ${await app.getUrl()}`);
 }
-bootstrap();
+bootstrap().finally(() => {
+    console.info('Success');
+  });
 
 
 
