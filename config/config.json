@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "Mypostgre20",
+    "database": "website",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "Mypostgre20",
+    "database": "test_database_name",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "Mypostgre20",
+    "database": "production_database_name",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}

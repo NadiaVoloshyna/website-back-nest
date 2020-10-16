@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Post } from '../posts/post.entity';
 
 @Table
 export class File extends Model<File> {
@@ -13,6 +14,16 @@ export class File extends Model<File> {
         allowNull: false,
     })
     url: string;
+
+    @ForeignKey(() => Post)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false,
+    })
+    postId: number;
+
+    @BelongsTo(() => Post)
+    post: Post;
 }
 
 

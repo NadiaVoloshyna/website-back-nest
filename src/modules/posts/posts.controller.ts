@@ -35,6 +35,24 @@ export class PostsController {
         return await this.postService.create(post, req.user.id);
     }
 
+//     @Post('images')
+//   @ApiCreatedResponse({
+//     type: File
+//   })
+//   @UseInterceptors(
+//     FileInterceptor('file', {
+//       storage: diskStorage({
+//         destination: process.env.PUBLIC_DIR || path.join(__dirname, '../../../public'),
+//         filename: editFileName,
+//       }),
+//       fileFilter: imageFileFilter,
+//     }),
+//   )
+//   public uploadedFile(@UploadedFile() file, @Request() req ): Promise<File> {
+//     return this.usersService.createAvatar(req.user.id, file);
+//   }
+
+
     @UseGuards(AuthGuard('jwt'))
     @Put(':id')
     async update(@Param('id') id: number, @Body() post: PostDto, @Request() req): Promise<PostEntity> {
