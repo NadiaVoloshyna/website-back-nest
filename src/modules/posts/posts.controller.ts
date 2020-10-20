@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, NotFoundException, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, NotFoundException, UseGuards, Request, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './post.entity';
 import { PostDto } from './dto/post.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { editFileName, imageFileFilter } from '../../utils/file-upload.utils';
+import { diskStorage } from 'multer';
 
 @Controller('posts')
 export class PostsController {
@@ -18,12 +21,10 @@ export class PostsController {
     async findOne(@Param('id') id: number): Promise<PostEntity> {
         // find the post with this id
         const post = await this.postService.findOne(id);
-
         // if the post doesn't exit in the db, throw a 404 error
         if (!post) {
             throw new NotFoundException('This Post doesn\'t exist');
         }
-
         // if post exist, return the post
         return post;
     }
@@ -35,36 +36,38 @@ export class PostsController {
         return await this.postService.create(post, req.user.id);
     }
 
-//     @Post('images')
-//   @ApiCreatedResponse({
-//     type: File
-//   })
-//   @UseInterceptors(
-//     FileInterceptor('file', {
-//       storage: diskStorage({
-//         destination: process.env.PUBLIC_DIR || path.join(__dirname, '../../../public'),
-//         filename: editFileName,
-//       }),
-//       fileFilter: imageFileFilter,
-//     }),
-//   )
-//   public uploadedFile(@UploadedFile() file, @Request() req ): Promise<File> {
-//     return this.usersService.createAvatar(req.user.id, file);
-//   }
+    @Post('image')
+    @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './filesImages',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  //   async uploadedFile(@UploadedFile() file, @Request() req ): Promise<File> {
+  //   return this.postService.createAvatar(req.post.id, file);
+  // }
 
+      async uploadedFile(@UploadedFile() file) {
+      const response = {
+        originalname: file.originalname,
+        filename: file.filename,
+      };
+      return response;
+    }
 
     @UseGuards(AuthGuard('jwt'))
     @Put(':id')
     async update(@Param('id') id: number, @Body() post: PostDto, @Request() req): Promise<PostEntity> {
         // get the number of row affected and the updated post
         const { numberOfAffectedRows, updatedPost } = await this.postService.update(id, post, req.user.id);
-
         // if the number of row affected is zero, 
         // it means the post doesn't exist in our db
         if (numberOfAffectedRows === 0) {
             throw new NotFoundException('This Post doesn\'t exist');
         }
-
         // return the updated post
         return updatedPost;
     }
@@ -74,13 +77,11 @@ export class PostsController {
     async remove(@Param('id') id: number, @Request() req) {
         // delete the post with this id
         const deleted = await this.postService.delete(id, req.user.id);
-
         // if the number of row affected is zero, 
         // then the post doesn't exist in our db
         if (deleted === 0) {
             throw new NotFoundException('This Post doesn\'t exist');
         }
-
         // return success message
         return 'Successfully deleted';
     }

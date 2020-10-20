@@ -1,6 +1,12 @@
 {
   "compilerOptions": {
     //"lib": ["es5", "es6", "es6.array"],
+    // "lib": [  
+    //   "esnext",  
+    //   "dom",  
+    //   "dom.iterable",  
+    //   "scripthost"  
+    //  ],
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
