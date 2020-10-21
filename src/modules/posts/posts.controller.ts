@@ -2,10 +2,12 @@ import { Controller, Get, Post, Put, Delete, Param, Body, NotFoundException, Use
 import { AuthGuard } from '@nestjs/passport';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './post.entity';
+import { File } from '../files/file.entity';
 import { PostDto } from './dto/post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { editFileName, imageFileFilter } from '../../utils/file-upload.utils';
 import { diskStorage } from 'multer';
+import * as path from "path";
 
 @Controller('posts')
 export class PostsController {
@@ -36,28 +38,26 @@ export class PostsController {
         return await this.postService.create(post, req.user.id);
     }
 
-    @Post('image')
+    //async create(@Res() res, @UploadedFile('file') file, @Body() body: any) {
+      //@Param() folderId, @Param() fileName
+
+    @Post('images')
     @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './filesImages',
+        destination: process.env.PUBLIC_DIR || path.join(__dirname, '../../../static'),
         filename: editFileName,
       }),
       fileFilter: imageFileFilter,
     }),
   )
-  //   async uploadedFile(@UploadedFile() file, @Request() req ): Promise<File> {
-  //   return this.postService.createAvatar(req.post.id, file);
-  // }
-
-      async uploadedFile(@UploadedFile() file) {
-      const response = {
-        originalname: file.originalname,
-        filename: file.filename,
-      };
-      return response;
-    }
-
+    async uploadedFile(@UploadedFile() file, @Body() body ): Promise<File> {
+    console.log(file);
+    console.log(body);
+    console.log(body.name);
+    return await this.postService.createFile(file, body.name, body.post_id);
+  }
+  
     @UseGuards(AuthGuard('jwt'))
     @Put(':id')
     async update(@Param('id') id: number, @Body() post: PostDto, @Request() req): Promise<PostEntity> {
