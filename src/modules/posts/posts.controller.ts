@@ -10,8 +10,9 @@ import { diskStorage } from 'multer';
 import * as path from "path";
 
 @Controller('posts')
+@UseGuards(AuthGuard())
 export class PostsController {
-    constructor(private readonly postService: PostsService) { }
+    constructor(private postService: PostsService) { }
 
     @Get()
     async findAll() {

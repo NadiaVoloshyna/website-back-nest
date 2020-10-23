@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, ConflictException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UsersService } from '../../modules/users/users.service';
 
@@ -16,7 +16,7 @@ export class DoesUserExist implements CanActivate {
     async validateRequest(request) {
         const userExist = await this.userService.findOneByEmail(request.body.email);
         if (userExist) {
-            throw new ForbiddenException('This email already exist');
+            throw new ConflictException('Username already exist');
         }
         return true;
     }

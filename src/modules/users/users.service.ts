@@ -7,7 +7,7 @@ import { USER_REPOSITORY } from '../../core/constants';
 export class UsersService {
 
     constructor(
-        @Inject(USER_REPOSITORY) private readonly userRepository: typeof User
+        @Inject(USER_REPOSITORY) private userRepository: typeof User
         ) { }
 
     async create(user: UserDto): Promise<User> {

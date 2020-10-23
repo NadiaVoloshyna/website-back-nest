@@ -1,16 +1,21 @@
-import { IsNotEmpty, MinLength, IsEmail, IsOptional } from 'class-validator';
+import { IsNotEmpty, MinLength, IsEmail, IsOptional, Matches, MaxLength } from 'class-validator';
 export class UserDto {
     @IsNotEmpty()
-    readonly name: string;
+    name: string;
 
     @IsNotEmpty()
     @IsEmail()
-    readonly email: string;
+    email: string;
 
     @IsNotEmpty()
-    @MinLength(6)
-    readonly password: string;
+    @MinLength(8)
+    @MaxLength(20)
+    @Matches(
+        /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
+        {message: 'password too weak'},
+        )
+    password: string;
 
     @IsOptional()
-    readonly phone: number;
+    phone: number;
 }
