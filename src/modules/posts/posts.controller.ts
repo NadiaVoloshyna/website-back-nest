@@ -38,23 +38,17 @@ export class PostsController {
         return await this.postService.create(post, req.user.id);
     }
 
-    //async create(@Res() res, @UploadedFile('file') file, @Body() body: any) {
-      //@Param() folderId, @Param() fileName
-
     @Post('images')
     @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: process.env.PUBLIC_DIR || path.join(__dirname, '../../../static'),
+        destination: process.env.PUBLIC_DIR || path.join(__dirname, '../../../public'),
         filename: editFileName,
       }),
       fileFilter: imageFileFilter,
     }),
   )
     async uploadedFile(@UploadedFile() file, @Body() body ): Promise<File> {
-    console.log(file);
-    console.log(body);
-    console.log(body.name);
     return await this.postService.createFile(file, body.name, body.post_id);
   }
   

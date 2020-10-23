@@ -23,8 +23,6 @@ export class PostsService {
           url: `${process.env.URL}/static/${file.filename}`,
           postId: bodyPostId,
         });
-        //await this.fileRepository.save({ id: postId, avatar: createAvatar });
-        //return createAvatar;
       }
       
     async findAll(): Promise<Post[]> {

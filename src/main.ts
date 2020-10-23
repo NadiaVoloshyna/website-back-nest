@@ -8,7 +8,7 @@ async function bootstrap() {
     app.setGlobalPrefix('api/v1');
     // handle all user input validation globally
     app.useGlobalPipes(new ValidateInputPipe());
-    await app.listen(3000);
+    await app.listen(parseInt(process.env.PORT));
     console.info(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap().finally(() => {
