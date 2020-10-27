@@ -10,7 +10,6 @@ import { diskStorage } from 'multer';
 import * as path from "path";
 
 @Controller('posts')
-@UseGuards(AuthGuard())
 export class PostsController {
     constructor(private postService: PostsService) { }
 
@@ -81,3 +80,6 @@ export class PostsController {
         return 'Successfully deleted';
     }
 }
+
+   
+

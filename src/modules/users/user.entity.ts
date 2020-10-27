@@ -26,5 +26,14 @@ export class User extends Model<User> {
         allowNull: true,
     })
     phone: number;
+
+// const Tutorial = sequelize.define("tutorial", { ... })
+// const Comment = sequelize.define("comment", { ... })
+
+// Tutorial.hasMany(Comment, { as: "comments" });
+// Comment.belongsTo(Tutorial, {
+//   foreignKey: "tutorialId",
+//   as: "tutorial",
+// });
 }
 

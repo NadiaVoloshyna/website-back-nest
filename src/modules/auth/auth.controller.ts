@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { UserDto } from '../users/dto/user.dto';
 import { DoesUserExist } from '../../core/guards/doesUserExist.guard';
 
+
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
@@ -20,3 +21,7 @@ export class AuthController {
         return await this.authService.create(user);
     }
 }
+
+
+    
+    

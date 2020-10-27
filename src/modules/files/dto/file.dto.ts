@@ -2,12 +2,12 @@ import { IsNotEmpty } from 'class-validator';
 
 export class FileDto {
     @IsNotEmpty()
-    readonly name: string;
+    name: string;
 
     @IsNotEmpty()
-    readonly url: string;
+    url: string;
 
     @IsNotEmpty()
-    readonly post_id: number;
+    post_id: number;
 }
 
