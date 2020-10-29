@@ -5,7 +5,6 @@ import { USER_REPOSITORY } from '../../core/constants';
 
 @Injectable()
 export class UsersService {
-
     constructor(
         @Inject(USER_REPOSITORY) private readonly userRepository: typeof User
         ) { }
@@ -21,4 +20,14 @@ export class UsersService {
     async findOneById(id: number): Promise<User> {
         return await this.userRepository.findOne<User>({ where: { id } });
     }
+
+    async findAll(): Promise<User[]> {
+        return await this.userRepository.findAll<User> ();
+    }
+
+    async getCurrent(id): Promise<User> {
+        return await this.userRepository.findOne<User>({ 
+            where: { id },
+    });
+}
 }

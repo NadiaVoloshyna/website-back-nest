@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -12,6 +13,7 @@ import * as path from "path";
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     ServeStaticModule.forRoot({
       //rootPath: process.env.PUBLIC_DIR ,
       rootPath: process.env.PUBLIC_DIR || path.join(__dirname, '../../public'),

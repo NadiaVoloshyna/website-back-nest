@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany, ForeignKey } from 'sequelize-typescript';
+import { Post } from '../posts/post.entity';
 
 @Table
 export class User extends Model<User> {
@@ -6,34 +7,36 @@ export class User extends Model<User> {
         type: DataType.STRING,
         allowNull: false,
     })
-    name: string;
+    public name: string;
 
     @Column({
         type: DataType.STRING,
         unique: true,
         allowNull: false,
     })
-    email: string;
+    public email: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
     })
-    password: string;
+    public password: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: true,
     })
-    phone: number;
+    public phone: number;
 
-// const Tutorial = sequelize.define("tutorial", { ... })
-// const Comment = sequelize.define("comment", { ... })
+    @ForeignKey(() => Post)
+    @Column({
+        //type: DataType.INTEGER,
+        //allowNull: true,
+    })
+    public postId: number;
 
-// Tutorial.hasMany(Comment, { as: "comments" });
-// Comment.belongsTo(Tutorial, {
-//   foreignKey: "tutorialId",
-//   as: "tutorial",
-// });
+    @HasMany(() => Post)
+    post: Post[];
+
 }
 

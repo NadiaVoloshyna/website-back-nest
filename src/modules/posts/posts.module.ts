@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { postsProviders } from './posts.providers';
@@ -9,6 +10,7 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     MulterModule.register({
       dest: 'static/uploads',
     }),

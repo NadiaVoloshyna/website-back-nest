@@ -1,5 +1,6 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany, } from 'sequelize-typescript';
 import { User } from '../users/user.entity';
+import { File } from '../files/file.entity';
 
 @Table
 export class Post extends Model<Post> {
@@ -24,4 +25,14 @@ export class Post extends Model<Post> {
 
     @BelongsTo(() => User)
     user: User;
+
+    @ForeignKey(() => File)
+    @Column({
+        //type: DataType.INTEGER,
+        //allowNull: false,
+    })
+    fileId: number;
+
+    @HasMany(() => File)
+    file: File;
 }

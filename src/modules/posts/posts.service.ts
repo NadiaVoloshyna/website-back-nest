@@ -17,11 +17,11 @@ export class PostsService {
         return await this.postRepository.create<Post>({ ...post, userId });
     }
 
-    async createFile(file: any, bodyName, bodyPostId): Promise<File> {
+    async createFile(id, file: any, bodyName): Promise<File> {
         return await this.fileRepository.create({
           name: bodyName,
           url: `${process.env.URL}/static/${file.filename}`,
-          postId: bodyPostId,
+          postId: id 
         });
       }
       

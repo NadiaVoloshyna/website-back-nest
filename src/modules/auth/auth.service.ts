@@ -10,13 +10,11 @@ export class AuthService {
         private readonly jwtService: JwtService,
         ) { }
 
-    async validateUser(username: string, pass: string) {
-        // find if user exist with this email
-        const user = await this.userService.findOneByEmail(username);
+    async validateUser(email: string, pass: string) {
+        const user = await this.userService.findOneByEmail(email);
         if (!user) {
             throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
             }
-        // find if user password match
         const match = await this.comparePassword(pass, user.password);
         if (!match) {
             throw new UnauthorizedException('Invalid credentials');
@@ -32,16 +30,12 @@ export class AuthService {
     }
 
     public async create(user) {
-        // hash the password
         const pass = await this.hashPassword(user.password);
-        // create the user
         const newUser = await this.userService.create({ ...user, password: pass });
         // tslint:disable-next-line: no-string-literal
-        const { password, ...result } = newUser['dataValues'];
-        // generate token
-        const token = await this.generateToken(result);
-        // return the user and the token
-        return { user: result, token };
+        //const { password, ...result } = newUser['dataValues'];
+        const token = await this.generateToken(user);
+        return { newUser, token };
     }
 
     private async generateToken(user) {

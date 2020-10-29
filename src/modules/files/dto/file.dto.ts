@@ -6,8 +6,5 @@ export class FileDto {
 
     @IsNotEmpty()
     url: string;
-
-    @IsNotEmpty()
-    post_id: number;
 }
 

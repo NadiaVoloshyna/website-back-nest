@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, NotFoundException, UseGuards, Request, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './post.entity';
 import { File } from '../files/file.entity';
@@ -15,30 +15,27 @@ export class PostsController {
 
     @Get()
     async findAll() {
-        // get all posts in the db
         return await this.postService.findAll();
     }
 
     @Get(':id')
     async findOne(@Param('id') id: number): Promise<PostEntity> {
-        // find the post with this id
         const post = await this.postService.findOne(id);
         // if the post doesn't exit in the db, throw a 404 error
         if (!post) {
             throw new NotFoundException('This Post doesn\'t exist');
         }
-        // if post exist, return the post
         return post;
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtAuthGuard)
     @Post()
     async create(@Body() post: PostDto, @Request() req): Promise<PostEntity> {
-        // create a new post and return the newly created post
         return await this.postService.create(post, req.user.id);
     }
 
-    @Post('images')
+    @UseGuards(JwtAuthGuard)
+    @Post(':id')
     @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -48,11 +45,11 @@ export class PostsController {
       fileFilter: imageFileFilter,
     }),
   )
-    async uploadedFile(@UploadedFile() file, @Body() body ): Promise<File> {
-    return await this.postService.createFile(file, body.name, body.post_id);
+    async uploadedFile(@Param('id') id: number, @UploadedFile() file, @Body() body ): Promise<File> {
+    return await this.postService.createFile(id, file, body.name);
   }
   
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtAuthGuard)
     @Put(':id')
     async update(@Param('id') id: number, @Body() post: PostDto, @Request() req): Promise<PostEntity> {
         // get the number of row affected and the updated post
@@ -62,21 +59,18 @@ export class PostsController {
         if (numberOfAffectedRows === 0) {
             throw new NotFoundException('This Post doesn\'t exist');
         }
-        // return the updated post
         return updatedPost;
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtAuthGuard)
     @Delete(':id')
     async remove(@Param('id') id: number, @Request() req) {
-        // delete the post with this id
         const deleted = await this.postService.delete(id, req.user.id);
         // if the number of row affected is zero, 
         // then the post doesn't exist in our db
         if (deleted === 0) {
             throw new NotFoundException('This Post doesn\'t exist');
         }
-        // return success message
         return 'Successfully deleted';
     }
 }
