@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { User } from './user.entity';
-import { UserDto } from './dto/user.dto';
+import { UserDto, UpdateUserDto } from './dto/user.dto';
 import { USER_REPOSITORY } from '../../core/constants';
 
 @Injectable()
@@ -28,12 +28,26 @@ export class UsersService {
     // async getUser(id): Promise<User> {
     //     return await this.userRepository.findOne<User>({ 
     //          where: { id },
+    //          attributes: { exclude: ['password'] },
     // });
     // }
 
     async getUser(email: string): Promise<User> {
         return await this.userRepository.findOne<User>({ 
              where: { email },
+             attributes: { exclude: ['password'] }, 
     });
+    }
+
+    async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    const [updatedUser] = await this.userRepository.update({ ...updateUserDto }, { where: { id }, returning: true });
+        return { updatedUser };
+
+    //     this.userRepository.update({id}, updateUserDto);
+    //     return await this.userRepository.findOne({
+    //          where: { id }
+    // });     
+    }
 }
-}
+
+
