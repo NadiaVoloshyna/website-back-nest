@@ -1,7 +1,9 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { UserDto, UpdateUserDto } from './dto/user.dto';
 import { USER_REPOSITORY } from '../../core/constants';
+
 
 @Injectable()
 export class UsersService {
@@ -39,15 +41,42 @@ export class UsersService {
     });
     }
 
-    async updateUser(id: number, updateUserDto: UpdateUserDto) {
-    const [updatedUser] = await this.userRepository.update({ ...updateUserDto }, { where: { id }, returning: true });
-        return { updatedUser };
-
-    //     this.userRepository.update({id}, updateUserDto);
+    // async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    //     console.log(updateUserDto.new_password);
+    //     const pass = await this.hashPassword(updateUserDto.new_password);
+    //     console.log(pass);
+    //     return await this.userRepository.update({ ...updateUserDto, password: pass }, { where: { id }, returning: true });
     //     return await this.userRepository.findOne({
-    //          where: { id }
-    // });     
+    //          where: { id },
+    //          attributes: { exclude: ['password'] },
+    // });         
+    // }
+
+    async updateUser(id: number, updateUserDto: UpdateUserDto) {  
+        if(updateUserDto.current_password !== '') {
+        const user = await this.findOneById(id);
+        const match = await this.comparePassword(updateUserDto.current_password, user.password);
+        if (!match) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+        }
+        if(updateUserDto.new_password !== '' && updateUserDto.current_password !== '') {  
+           
+        const pass = await this.hashPassword(updateUserDto.new_password);
+        return await this.userRepository.update({ ...updateUserDto, password: pass }, { where: { id }, returning: true });
+        } else {
+        return await this.userRepository.update({ ...updateUserDto }, { where: { id }, returning: true });
+        }
+    }
+    
+    private async comparePassword(enteredPassword, dbPassword) {
+        const match = await bcrypt.compare(enteredPassword, dbPassword); 
+        return match; 
+    }
+
+    private async hashPassword(password) {
+        const hash = await bcrypt.hash(password, 10);
+        return hash;
     }
 }
-
 

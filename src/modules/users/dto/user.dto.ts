@@ -1,4 +1,6 @@
 import { IsNotEmpty, ValidateIf, MinLength, IsEmail, IsOptional, Matches, MaxLength } from 'class-validator';
+import { Expose } from 'class-transformer';
+import { User } from '../user.entity';
 export class UserDto {
     @IsNotEmpty()
     name: string;
@@ -22,6 +24,7 @@ export class UserDto {
 
 export class UpdateUserDto {
     @IsOptional()
+    @MinLength(3)
     name: string;
 
     @IsOptional()
@@ -29,17 +32,16 @@ export class UpdateUserDto {
     email: string;
 
     @IsOptional()
+    current_password?: string;
+
+    @ValidateIf(UpdateUserDto => UpdateUserDto.new_password !== null && UpdateUserDto.new_password !== '')
     @MinLength(8)
     @MaxLength(20)
     @Matches(
         /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
         {message: 'password too weak'},
-        )
-    current_password: string;
-
-    @ValidateIf(o => o.current_password === 'value')
-    @IsNotEmpty()
-    new_password: string;
+        )   
+    new_password?: string;
 
     @IsOptional()
     phone: number;

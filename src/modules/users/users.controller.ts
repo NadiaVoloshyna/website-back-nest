@@ -30,7 +30,6 @@ export class UsersController {
     @Put('me')
     async updateCurrentUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
         console.log(updateUserDto);
-        console.log(req.user.id);
         return await this.userService.updateUser(req.user.id, updateUserDto);
     }
 

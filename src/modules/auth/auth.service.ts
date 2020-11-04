@@ -33,13 +33,13 @@ export class AuthService {
         const pass = await this.hashPassword(user.password);
         const newUser = await this.userService.create({ ...user, password: pass });
         // tslint:disable-next-line: no-string-literal
-        //const { password, ...result } = newUser['dataValues'];
+        const { password, ...result } = newUser['dataValues'];
         const token = await this.generateToken(user);
         return { newUser, token };
     }
 
     private async generateToken(user) {
-        const token = await this.jwtService.signAsync(user);
+        const token = await this.jwtService.signAsync(JSON.parse(JSON.stringify(user)));
         return token;
     }
 
