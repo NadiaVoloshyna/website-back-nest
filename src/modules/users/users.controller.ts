@@ -15,20 +15,21 @@ export class UsersController {
         return await this.userService.findAll();
     }
 
-    @Get(':id')
-    async findOne(@Param('id') id: number): Promise<User> {
-        return await this.userService.findOneById(id);
-    }
-
-    // @UseGuards(JwtAuthGuard)
     // @Get('me')
     // async getCurrentUser(@Request() req): Promise<User> {
+    //     console.log(req.user.id);
     //     return await this.userService.getUser(req.user.id);
     // }
 
     @Get('me')
     async getCurrentUser(@CurrentUser('email') email: string): Promise<User> {
+        console.log(email);
     return await this.userService.getUser(email);
+    }
+
+    @Get(':id')
+    async findOne(@Param('id') id: number): Promise<User> {
+        return await this.userService.findOneById(id);
     }
 
     @Put('me')

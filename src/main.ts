@@ -9,6 +9,9 @@ async function bootstrap() {
         whitelist: true,
         skipMissingProperties: true,
         transform: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
       }));
     await app.listen(parseInt(process.env.PORT));
     console.info(`Application is running on: ${await app.getUrl()}`);

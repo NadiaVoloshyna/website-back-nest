@@ -1,6 +1,4 @@
 import { IsNotEmpty, ValidateIf, MinLength, IsEmail, IsOptional, Matches, MaxLength } from 'class-validator';
-import { Expose } from 'class-transformer';
-import { User } from '../user.entity';
 export class UserDto {
     @IsNotEmpty()
     name: string;

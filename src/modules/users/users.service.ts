@@ -22,7 +22,7 @@ export class UsersService {
     async findOneById(id: number): Promise<User> {
         return await this.userRepository.findOne<User>({ 
             where: { id },
-            attributes: { exclude: ['password'] },
+            //attributes: { exclude: ['password'] },
         });
     }
 
@@ -30,7 +30,7 @@ export class UsersService {
         return await this.userRepository.findAll<User> ();
     }
 
-    // async getUser(id): Promise<User> {
+    // async getUser(id: number): Promise<User> {
     //     return await this.userRepository.findOne<User>({ 
     //          where: { id },
     //          attributes: { exclude: ['password'] },
@@ -38,6 +38,7 @@ export class UsersService {
     // }
 
     async getUser(email: string): Promise<User> {
+        console.log(email);
         return await this.userRepository.findOne<User>({ 
              where: { email },
              attributes: { exclude: ['password'] }, 
