@@ -1,4 +1,4 @@
-import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { UserDto, UpdateUserDto } from './dto/user.dto';
@@ -20,7 +20,10 @@ export class UsersService {
     }
 
     async findOneById(id: number): Promise<User> {
-        return await this.userRepository.findOne<User>({ where: { id } });
+        return await this.userRepository.findOne<User>({ 
+            where: { id },
+            attributes: { exclude: ['password'] },
+        });
     }
 
     async findAll(): Promise<User[]> {
@@ -41,17 +44,6 @@ export class UsersService {
     });
     }
 
-    // async updateUser(id: number, updateUserDto: UpdateUserDto) {
-    //     console.log(updateUserDto.new_password);
-    //     const pass = await this.hashPassword(updateUserDto.new_password);
-    //     console.log(pass);
-    //     return await this.userRepository.update({ ...updateUserDto, password: pass }, { where: { id }, returning: true });
-    //     return await this.userRepository.findOne({
-    //          where: { id },
-    //          attributes: { exclude: ['password'] },
-    // });         
-    // }
-
     async updateUser(id: number, updateUserDto: UpdateUserDto) {  
         if(updateUserDto.current_password !== '') {
         const user = await this.findOneById(id);
@@ -61,11 +53,18 @@ export class UsersService {
         }
         }
         if(updateUserDto.new_password !== '' && updateUserDto.current_password !== '') {  
-           
         const pass = await this.hashPassword(updateUserDto.new_password);
-        return await this.userRepository.update({ ...updateUserDto, password: pass }, { where: { id }, returning: true });
+        await this.userRepository.update({ ...updateUserDto, password: pass }, { where: { id }, returning: true });
+        return await this.userRepository.findOne({
+            where: { id },
+            attributes: { exclude: ['password'] },
+        }); 
         } else {
-        return await this.userRepository.update({ ...updateUserDto }, { where: { id }, returning: true });
+        await this.userRepository.update({ ...updateUserDto }, { where: { id }, returning: true });
+        return await this.userRepository.findOne({
+            where: { id },
+            attributes: { exclude: ['password'] },
+        }); 
         }
     }
     
@@ -78,5 +77,20 @@ export class UsersService {
         const hash = await bcrypt.hash(password, 10);
         return hash;
     }
+
+    async delete(id: number): Promise<User> {
+        const user = await this.userRepository.findOne({
+            where: { id },
+        });
+        if(!user) {
+            throw new HttpException('User with this ID not found', HttpStatus.NOT_FOUND);
+        }
+        await this.userRepository.destroy({
+            where: { id },
+        });
+        return user;
+    }
 }
+
+
 
