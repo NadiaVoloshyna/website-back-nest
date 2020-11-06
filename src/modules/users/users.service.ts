@@ -2,6 +2,7 @@ import { Injectable, Inject, UnauthorizedException, HttpException, HttpStatus } 
 import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { UserDto, UpdateUserDto } from './dto/user.dto';
+import { GetUserFilterDto } from './dto/get-user-filter.dto';
 import { USER_REPOSITORY } from '../../core/constants';
 
 
@@ -27,7 +28,9 @@ export class UsersService {
     }
 
     async findAll(): Promise<User[]> {
-        return await this.userRepository.findAll<User> ();
+        return await this.userRepository.findAll<User> ({
+            attributes: { exclude: ['password'] }, 
+        });
     }
 
     // async getUser(id: number): Promise<User> {
@@ -38,12 +41,25 @@ export class UsersService {
     // }
 
     async getUser(email: string): Promise<User> {
-        console.log(email);
         return await this.userRepository.findOne<User>({ 
              where: { email },
              attributes: { exclude: ['password'] }, 
     });
     }
+
+    async getUserWithFilter(filterDto: GetUserFilterDto) {
+        const { search } = filterDto; 
+        let users = await this.findAll();
+        if(search) {
+            users = users.filter(user => 
+                user.name.toLowerCase().includes( search.toLowerCase() ),
+                );
+            }
+            if(!users.length) {
+                throw new HttpException('Users matching your search not found', HttpStatus.NOT_FOUND);
+            }
+            return users;
+        }
 
     async updateUser(id: number, updateUserDto: UpdateUserDto) {  
         if(updateUserDto.current_password !== '') {

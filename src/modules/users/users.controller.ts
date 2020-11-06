@@ -1,8 +1,9 @@
-import { Controller, Get, Put, Request, UseGuards, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Put, Request, UseGuards, Body, Param, Delete, Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { UpdateUserDto } from './dto/user.dto';
+import { GetUserFilterDto } from './dto/get-user-filter.dto';
 import { CurrentUser } from './user.decorator';
 
 @UseGuards(JwtAuthGuard)
@@ -13,6 +14,11 @@ export class UsersController {
     @Get()
     async findAll(): Promise<User[]> {
         return await this.userService.findAll();
+    }
+
+    @Get('search')
+    async getUser(@Query() filterDto: GetUserFilterDto) {
+        return await this.userService.getUserWithFilter(filterDto);
     }
 
     // @Get('me')
