@@ -21,12 +21,13 @@ export class PostsController {
     @Get(':id')
     async findOne(@Param('id') id: number): Promise<PostEntity> {
         const post = await this.postService.findOne(id);
-        // if the post doesn't exit in the db, throw a 404 error
         if (!post) {
             throw new NotFoundException('This Post doesn\'t exist');
         }
         return post;
     }
+
+    
 
     @UseGuards(JwtAuthGuard)
     @Post()
@@ -52,10 +53,7 @@ export class PostsController {
     @UseGuards(JwtAuthGuard)
     @Put(':id')
     async update(@Param('id') id: number, @Body() post: PostDto, @Request() req): Promise<PostEntity> {
-        // get the number of row affected and the updated post
         const { numberOfAffectedRows, updatedPost } = await this.postService.update(id, post, req.user.id);
-        // if the number of row affected is zero, 
-        // it means the post doesn't exist in our db
         if (numberOfAffectedRows === 0) {
             throw new NotFoundException('This Post doesn\'t exist');
         }
@@ -66,8 +64,6 @@ export class PostsController {
     @Delete(':id')
     async remove(@Param('id') id: number, @Request() req) {
         const deleted = await this.postService.delete(id, req.user.id);
-        // if the number of row affected is zero, 
-        // then the post doesn't exist in our db
         if (deleted === 0) {
             throw new NotFoundException('This Post doesn\'t exist');
         }

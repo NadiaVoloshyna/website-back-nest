@@ -33,18 +33,24 @@ export class PostsService {
 
     async findOne(id): Promise<Post> {
         return await this.postRepository.findOne({
-        	where: { id },
-        	include: [{ model: User, attributes: { exclude: ['password'] } }],
+            where: { id },
+        	include: [
+                { model: File, attributes: { exclude: ['id', 'name', 'postId', 'createdAt', 'updatedAt'] }}, 
+                { model: User, attributes: { exclude: ['password'] } }],
     	});
     }
+
+
 
     async delete(id, userId) {
         return await this.postRepository.destroy({ where: { id, userId } });
     }
 
     async update(id, data, userId) {
-        const [numberOfAffectedRows, [updatedPost]] = await this.postRepository.update({ ...data }, { where: { id, userId }, returning: true });
-
+        const [numberOfAffectedRows, [updatedPost]] = await this.postRepository.update(
+            { ...data }, 
+            { where: { id, userId }, returning: true },
+            );
         return { numberOfAffectedRows, updatedPost };
     }
 }

@@ -28,12 +28,12 @@ export class User extends Model<User> {
     })
     public phone: number;
 
-    @ForeignKey(() => Post)
-    @Column({
-        //type: DataType.INTEGER,
-        //allowNull: true,
-    })
-    public postId: number;
+    // @ForeignKey(() => Post or User???)
+    // @Column({
+    //     //type: DataType.INTEGER,
+    //     //allowNull: true,
+    // })
+    // public postId: number;
 
     @HasMany(() => Post)
     post: Post[];
