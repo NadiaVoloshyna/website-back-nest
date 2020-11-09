@@ -21,10 +21,14 @@ export class UsersService {
     }
 
     async findOneById(id: number): Promise<User> {
-        return await this.userRepository.findOne<User>({ 
+        const user =  await this.userRepository.findOne<User>({ 
             where: { id },
             //attributes: { exclude: ['password'] },
         });
+        if (!user) {
+        throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+        }
+        return user;
     }
 
     async findAll(): Promise<User[]> {
@@ -43,7 +47,7 @@ export class UsersService {
     async getUser(email: string): Promise<User> {
         return await this.userRepository.findOne<User>({ 
              where: { email },
-             attributes: { exclude: ['password'] }, 
+             attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }, 
     });
     }
 
@@ -74,13 +78,13 @@ export class UsersService {
         await this.userRepository.update({ ...updateUserDto, password: pass }, { where: { id }, returning: true });
         return await this.userRepository.findOne({
             where: { id },
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
         }); 
         } else {
         await this.userRepository.update({ ...updateUserDto }, { where: { id }, returning: true });
         return await this.userRepository.findOne({
             where: { id },
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
         }); 
         }
     }

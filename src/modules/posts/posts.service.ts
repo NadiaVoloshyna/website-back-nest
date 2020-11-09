@@ -1,6 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
+import Sequelize, { Op } from 'sequelize';
 import { Post } from './post.entity';
 import { PostDto } from './dto/post.dto';
+import { GetPostFilterDto } from './dto/get-post-filter.dto';
 import { File } from '../files/file.entity';
 import { User } from '../users/user.entity';
 import { POST_REPOSITORY } from '../../core/constants';
@@ -36,11 +38,45 @@ export class PostsService {
             where: { id },
         	include: [
                 { model: File, attributes: { exclude: ['id', 'name', 'postId', 'createdAt', 'updatedAt'] }}, 
-                { model: User, attributes: { exclude: ['password'] } }],
+                { model: User, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
+            ],
     	});
     }
 
+    async getPostWithFilter(filterDto: GetPostFilterDto, userId): Promise<Post[]> {
+        const { search } = filterDto;
+        const Op = Sequelize.Op;
+        return await this.postRepository.findAll({
+            order: [
+                ['createdAt', 'DESC'],
+            ],
+            where: {
+                title: { [Op.iLike]: '%' + search + '%' },     
+            },
+            include: [
+                { model: File, attributes: { exclude: ['id', 'name', 'postId', 'createdAt', 'updatedAt'] }},
+                { model: User, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
+            ]
+        });
+    }
 
+//     const Op = Sequelize.Op;
+// Article.findAll({
+//   where: {
+//     [Op.or]: [
+//      title: { [Op.like]: '%' + searchQuery + '%' },
+//      description: { [Op.like]: '%' + searchQuery2 + '%' }
+//     ]
+//   }
+// });
+
+//     where = {
+//      [Op.or]: [
+//        { name: { [Op.like]: `%${req.query.query_string}%` } },
+//        { description: { [Op.like]: `%${req.query.query_string}%` } }
+//      ]
+//    }
+//    });
 
     async delete(id, userId) {
         return await this.postRepository.destroy({ where: { id, userId } });

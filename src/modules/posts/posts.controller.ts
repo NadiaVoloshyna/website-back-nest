@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, NotFoundException, UseGuards, Request, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Query, Body, NotFoundException, UseGuards, Request, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from './post.entity';
 import { File } from '../files/file.entity';
 import { PostDto } from './dto/post.dto';
+import { GetPostFilterDto } from './dto/get-post-filter.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { editFileName, imageFileFilter } from '../../utils/file-upload.utils';
 import { diskStorage } from 'multer';
@@ -18,6 +19,12 @@ export class PostsController {
         return await this.postService.findAll();
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('search')
+    async getPost(@Query() filterDto: GetPostFilterDto, @Request() req) {
+        return await this.postService.getPostWithFilter(filterDto, req.user.id);
+    }
+
     @Get(':id')
     async findOne(@Param('id') id: number): Promise<PostEntity> {
         const post = await this.postService.findOne(id);
@@ -26,8 +33,6 @@ export class PostsController {
         }
         return post;
     }
-
-    
 
     @UseGuards(JwtAuthGuard)
     @Post()
