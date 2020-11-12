@@ -10,6 +10,7 @@ import { editFileName, imageFileFilter } from '../../utils/file-upload.utils';
 import { diskStorage } from 'multer';
 import * as path from "path";
 
+@UseGuards(JwtAuthGuard)
 @Controller('posts')
 export class PostsController {
     constructor(private postService: PostsService) { }
@@ -19,10 +20,9 @@ export class PostsController {
         return await this.postService.findAll();
     }
 
-    @UseGuards(JwtAuthGuard)
     @Get('search')
-    async getPost(@Query() filterDto: GetPostFilterDto, @Request() req) {
-        return await this.postService.getPostWithFilter(filterDto, req.user.id);
+    async getPost(@Query() filterDto: GetPostFilterDto) {
+        return await this.postService.getPostWithFilter(filterDto);
     }
 
     @Get(':id')
@@ -34,13 +34,11 @@ export class PostsController {
         return post;
     }
 
-    @UseGuards(JwtAuthGuard)
     @Post()
     async create(@Body() post: PostDto, @Request() req): Promise<PostEntity> {
         return await this.postService.create(post, req.user.id);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Post(':id')
     @UseInterceptors(
     FileInterceptor('file', {
@@ -50,12 +48,20 @@ export class PostsController {
       }),
       fileFilter: imageFileFilter,
     }),
-  )
+    )
     async uploadedFile(@Param('id') id: number, @UploadedFile() file, @Body() body ): Promise<File> {
     return await this.postService.createFile(id, file, body.name);
-  }
+    }
+    
+    @Delete('/delete/:id')
+    async deleteFile(@Param('id') id: number) {
+        const deleted = await this.postService.deleteFile(id);
+        if (deleted === 0) {
+            throw new NotFoundException('This File doesn\'t exist');
+        }
+        return 'Successfully deleted';
+    }
   
-    @UseGuards(JwtAuthGuard)
     @Put(':id')
     async update(@Param('id') id: number, @Body() post: PostDto, @Request() req): Promise<PostEntity> {
         const { numberOfAffectedRows, updatedPost } = await this.postService.update(id, post, req.user.id);
@@ -65,7 +71,6 @@ export class PostsController {
         return updatedPost;
     }
 
-    @UseGuards(JwtAuthGuard)
     @Delete(':id')
     async remove(@Param('id') id: number, @Request() req) {
         const deleted = await this.postService.delete(id, req.user.id);

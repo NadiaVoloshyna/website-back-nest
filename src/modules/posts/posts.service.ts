@@ -1,5 +1,5 @@
-import { Injectable, Inject } from '@nestjs/common';
-import Sequelize, { Op } from 'sequelize';
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
+import Sequelize from 'sequelize';
 import { Post } from './post.entity';
 import { PostDto } from './dto/post.dto';
 import { GetPostFilterDto } from './dto/get-post-filter.dto';
@@ -26,6 +26,11 @@ export class PostsService {
           postId: id 
         });
       }
+
+      async deleteFile(id) {
+          console.log(id);
+        return await this.fileRepository.destroy({ where: { id } });
+    }
       
     async findAll(): Promise<Post[]> {
         return await this.postRepository.findAll<Post>({
@@ -43,40 +48,46 @@ export class PostsService {
     	});
     }
 
-    async getPostWithFilter(filterDto: GetPostFilterDto, userId): Promise<Post[]> {
-        const { search } = filterDto;
+    async getPostWithFilter(filterDto: GetPostFilterDto): Promise<Post[]> {
+        const { title, user_id } = filterDto;
         const Op = Sequelize.Op;
-        return await this.postRepository.findAll({
-            order: [
-                ['createdAt', 'DESC'],
-            ],
-            where: {
-                title: { [Op.iLike]: '%' + search + '%' },     
-            },
-            include: [
-                { model: File, attributes: { exclude: ['id', 'name', 'postId', 'createdAt', 'updatedAt'] }},
-                { model: User, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
-            ]
-        });
+        if(user_id !== 0) {
+        const posts = await this.postRepository.findAll({
+                    order: [
+                        ['createdAt', 'desc'],
+                    ],
+                    where: {
+                            title: { [Op.iLike]: '%' + title + '%' },
+                    },
+                    include: [
+                        { model: File, attributes: { exclude: ['id', 'name', 'postId', 'createdAt', 'updatedAt'] }},
+                        { model: User, where: {id: [ user_id ]}, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }}
+                    ]
+                });
+        if(!posts.length) {
+                    throw new HttpException('Posts matching your search not found', HttpStatus.NOT_FOUND);
+                }
+                return posts;
+
+        } else {
+            const posts = await this.postRepository.findAll({
+                order: [
+                    ['createdAt', 'desc'],
+                ],
+                where: {
+                        title: { [Op.iLike]: '%' + title + '%' },
+                },
+                include: [
+                    { model: File, attributes: { exclude: ['id', 'name', 'postId', 'createdAt', 'updatedAt'] }},
+                    { model: User, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }}
+                ]
+            });
+    if(!posts.length) {
+                throw new HttpException('Posts matching your search not found', HttpStatus.NOT_FOUND);
+            }
+            return posts;
+        }
     }
-
-//     const Op = Sequelize.Op;
-// Article.findAll({
-//   where: {
-//     [Op.or]: [
-//      title: { [Op.like]: '%' + searchQuery + '%' },
-//      description: { [Op.like]: '%' + searchQuery2 + '%' }
-//     ]
-//   }
-// });
-
-//     where = {
-//      [Op.or]: [
-//        { name: { [Op.like]: `%${req.query.query_string}%` } },
-//        { description: { [Op.like]: `%${req.query.query_string}%` } }
-//      ]
-//    }
-//    });
 
     async delete(id, userId) {
         return await this.postRepository.destroy({ where: { id, userId } });
