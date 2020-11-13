@@ -49,8 +49,8 @@ export class PostsController {
       fileFilter: imageFileFilter,
     }),
     )
-    async uploadedFile(@Param('id') id: number, @UploadedFile() file, @Body() body ): Promise<File> {
-    return await this.postService.createFile(id, file, body.name);
+    async uploadedFile(@Param('id') postId: number, @UploadedFile() file, @Body() body, @Request() req ): Promise<File> {
+    return await this.postService.createFile(postId, file, body.name, req.user.id);
     }
     
     @Delete('/delete/:id')
