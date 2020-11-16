@@ -21,15 +21,15 @@ export class UserDto {
 }
 
 export class UpdateUserDto {
-    @IsOptional()
+    @IsNotEmpty()
     @MinLength(3)
     name: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsEmail()
     email: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     current_password?: string;
 
     @ValidateIf(UpdateUserDto => UpdateUserDto.new_password !== null && UpdateUserDto.new_password !== '')

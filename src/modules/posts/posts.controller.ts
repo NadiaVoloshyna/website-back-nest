@@ -64,11 +64,11 @@ export class PostsController {
   
     @Put(':id')
     async update(@Param('id') id: number, @Body() post: PostDto, @Request() req): Promise<PostEntity> {
-        const { numberOfAffectedRows, updatedPost } = await this.postService.update(id, post, req.user.id);
-        if (numberOfAffectedRows === 0) {
+        const updated =  await this.postService.update(id, post, req.user.id);
+        if(!updated) {
             throw new NotFoundException('This Post doesn\'t exist');
         }
-        return updatedPost;
+        return updated;
     }
 
     @Delete(':id')

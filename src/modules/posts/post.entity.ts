@@ -26,13 +26,7 @@ export class Post extends Model<Post> {
     @BelongsTo(() => User)
     user: User;
 
-    // @ForeignKey(() => File or Post???)
-    // @Column({
-    //     //type: DataType.INTEGER,
-    //     //allowNull: false,
-    // })
-    // fileId: number;
-
+    @ForeignKey(() => Post)
     @HasMany(() => File)
-    file: File;
+    file: File[];
 }

@@ -1,5 +1,6 @@
 import { Table, Column, Model, DataType, HasMany, ForeignKey } from 'sequelize-typescript';
 import { Post } from '../posts/post.entity';
+import { File } from '../files/file.entity';
 
 @Table
 export class User extends Model<User> {
@@ -28,15 +29,14 @@ export class User extends Model<User> {
     })
     public phone: number;
 
-    // @ForeignKey(() => Post or User???)
-    // @Column({
-    //     //type: DataType.INTEGER,
-    //     //allowNull: true,
-    // })
-    // public postId: number;
-
+    @ForeignKey(() => User)
     @HasMany(() => Post)
-    post: Post[];
+    posts: Post[];
 
+    @ForeignKey(() => User)
+    @HasMany(() => File)
+    file: File[];
 }
+
+
 

@@ -16,16 +16,31 @@ export class PostsService {
     ) { }
 
     async create(post: PostDto, userId): Promise<Post> {
-        return await this.postRepository.create<Post>({ ...post, userId });
+        await this.postRepository.create<Post>({ ...post, userId });
+        return this.postRepository.findOne({
+            where: { ...post, userId },
+        	include: [
+                { model: File, attributes: { exclude: ['id', 'name', 'postId', 'createdAt', 'updatedAt'] }}, 
+                { model: User, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
+            ],
+    	});
     }
 
     async createFile(postId, file: any, bodyName, userId): Promise<File> {
-        return await this.fileRepository.create({
+        await this.fileRepository.create<File>({
           name: bodyName,
           url: `${process.env.URL}/static/${file.filename}`,
           postId: postId, 
           userId: userId,
           where: { userId } 
+        });
+        return this.fileRepository.findOne({
+            where: { userId, postId },
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+            include: [
+                { model: Post, attributes: { exclude: ['createdAt', 'updatedAt'] }}, 
+                { model: User, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
+            ],
         });
       }
 
@@ -95,11 +110,17 @@ export class PostsService {
         return await this.postRepository.destroy({ where: { id, userId } });
     }
 
-    async update(id, data, userId) {
-        const [numberOfAffectedRows, [updatedPost]] = await this.postRepository.update(
+    async update(id, data, userId): Promise<Post> {
+        await this.postRepository.update<Post>(
             { ...data }, 
             { where: { id, userId }, returning: true },
             );
-        return { numberOfAffectedRows, updatedPost };
-    }
+        return this.postRepository.findOne({
+            where: { id, userId },
+            include: [
+                { model: File, attributes: { exclude: ['id', 'name', 'postId', 'createdAt', 'updatedAt'] }}, 
+                { model: User, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
+            ],
+    });
+}
 }
