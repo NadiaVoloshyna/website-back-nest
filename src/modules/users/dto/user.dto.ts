@@ -22,7 +22,7 @@ export class UserDto {
 
 export class UpdateUserDto {
     @IsNotEmpty()
-    @MinLength(3)
+    @MinLength(2)
     name: string;
 
     @IsNotEmpty()

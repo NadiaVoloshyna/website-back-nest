@@ -29,6 +29,14 @@ export class AuthService {
         return { token };
     }
 
+    public async payload(payload) {
+        const user = await this.userService.findOneByEmail(payload.email)
+        if (!user) {
+          throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+        }
+        return user;
+      }
+
     public async create(user) {
         const pass = await this.hashPassword(user.password);
         const newUser = await this.userService.create({ ...user, password: pass });

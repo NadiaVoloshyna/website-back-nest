@@ -18,6 +18,7 @@ export class UsersController {
 
     @Get('search')
     async getUser(@Query() filterDto: GetUserFilterDto) {
+        console.log(filterDto);
         return await this.userService.getUserWithFilter(filterDto);
     }
 

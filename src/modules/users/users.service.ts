@@ -53,6 +53,7 @@ export class UsersService {
 
     async getUserWithFilter(filterDto: GetUserFilterDto) {
         const { search } = filterDto; 
+        console.log(search);
         let users = await this.findAll();
         if(search) {
             users = users.filter(user => 
