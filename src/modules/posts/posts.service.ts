@@ -51,7 +51,10 @@ export class PostsService {
       
     async findAll(): Promise<Post[]> {
         return await this.postRepository.findAll<Post>({
-        	include: [{ model: User, attributes: { exclude: ['password'] } }],
+            include: [
+                { model: User, attributes: { exclude: ['password'] } },
+                { model: File, attributes: { exclude: ['createdAt', 'updatedAt'] }}, 
+            ],     
     	});
     }
 

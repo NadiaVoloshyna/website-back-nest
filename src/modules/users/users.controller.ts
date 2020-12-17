@@ -47,6 +47,7 @@ export class UsersController {
 
     @Delete(':id')
     async delete(@Param('id') id: number) {
+        console.log(id);
         const deleted = await this.userService.delete(id);
         if(deleted) {
             return 'Successfully deleted';
