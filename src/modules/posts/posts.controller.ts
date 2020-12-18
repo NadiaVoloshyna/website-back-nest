@@ -16,8 +16,8 @@ export class PostsController {
     constructor(private postService: PostsService) { }
 
     @Get()
-    async findAll() {
-        return await this.postService.findAll();
+    async findAll(@Request() req) {
+        return await this.postService.findAll(req.user.id);
     }
 
     @Get('search')

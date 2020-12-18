@@ -49,8 +49,9 @@ export class PostsService {
         return await this.fileRepository.destroy({ where: { id } });
     }
       
-    async findAll(): Promise<Post[]> {
+    async findAll(userId): Promise<Post[]> {
         return await this.postRepository.findAll<Post>({
+            where: { userId },
             include: [
                 { model: User, attributes: { exclude: ['password'] } },
                 { model: File, attributes: { exclude: ['createdAt', 'updatedAt'] }}, 
